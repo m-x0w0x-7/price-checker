@@ -1,4 +1,4 @@
-import { STORAGE_KEY, MIN_ITEMS, MAX_ITEMS } from './constants.js'
+import { STORAGE_KEY, MIN_ITEMS, MAX_ITEMS, UNITS } from './constants.js'
 import { normalizeInput, validateValue } from './validation.js'
 import { createItem } from './state.js'
 
@@ -62,8 +62,11 @@ export function restoreState(saved) {
     items.push(createItem())
   }
 
+  // unit はホワイトリスト検証し、不正値は 'g' にフォールバック
+  const unit = UNITS.includes(saved.unit) ? saved.unit : 'g'
+
   return {
-    unit: saved.unit ?? 'g',
+    unit,
     items,
     result: null,
   }

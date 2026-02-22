@@ -29,7 +29,7 @@ function tryCalculate() {
   )
 
   if (allValid) {
-    state = { ...state, result: calculate(state.items) }
+    state = { ...state, result: calculate(state.items, state.unit) }
   } else {
     state = { ...state, result: null }
   }

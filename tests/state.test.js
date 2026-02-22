@@ -152,12 +152,23 @@ describe('state', () => {
       expect(next.result).toBeNull()
     })
 
-    it('unit 変更時に price は保持される', () => {
+    it('unit 変更時に全商品の price もクリアする', () => {
       let state = createInitialState()
       state = updateItemField(state, 0, 'price', 500)
+      state = updateItemField(state, 1, 'price', 300)
 
       const next = setUnit(state, 'bag')
-      expect(next.items[0].price).toBe(500)
+      expect(next.items[0].price).toBe('')
+      expect(next.items[1].price).toBe('')
+    })
+
+    it('unit 変更時に qty/price 両方の errors をクリアする', () => {
+      let state = createInitialState()
+      state = updateItemField(state, 0, 'errors', { qty: 'エラー', price: 'エラー' })
+
+      const next = setUnit(state, 'ml')
+      expect(next.items[0].errors.qty).toBe('')
+      expect(next.items[0].errors.price).toBe('')
     })
   })
 })

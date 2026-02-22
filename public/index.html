@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>単価比較</title>
+  <link rel="stylesheet" href="../src/assets/styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1 class="header__title">単価比較</h1>
+    </header>
+
+    <main class="main">
+      <!-- 単位セレクト -->
+      <section class="unit-section">
+        <label class="unit-section__label" for="unit-select">比較単位</label>
+        <div class="unit-section__select-wrapper">
+          <select id="unit-select" class="unit-section__select">
+            <option value="g">g（グラム）</option>
+            <option value="ml">ml（ミリリットル）</option>
+            <option value="piece">個</option>
+            <option value="bag">袋</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- 商品リスト -->
+      <ul id="item-list" class="item-list">
+        <!-- 商品カードは JS で生成 -->
+      </ul>
+
+      <!-- 追加ボタン -->
+      <div class="add-button-wrapper">
+        <button id="add-btn" class="add-btn" type="button">＋ 商品を追加</button>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="../src/js/main.js"></script>
+</body>
+</html>

@@ -190,4 +190,46 @@ describe('storage', () => {
       expect(state.items.length).toBe(2)
     })
   })
+
+  describe('restoreState — 非数値型正規化（High: NaN 防止）', () => {
+    it('qty が文字列 "abc" のとき空文字に正規化され未入力扱いになる', () => {
+      const saved = { unit: 'g', items: [{ qty: 'abc', price: 100 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      // normalizeInput('abc') → '' → 未入力扱い（エラーなし）
+      expect(state.items[0].qty).toBe('')
+      expect(state.items[0].errors.qty).toBe('')
+    })
+
+    it('price が文字列 "xyz" のとき空文字に正規化される', () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: 'xyz' }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].price).toBe('')
+      expect(state.items[0].errors.price).toBe('')
+    })
+
+    it('qty が null のとき空文字に正規化される', () => {
+      const saved = { unit: 'g', items: [{ qty: null, price: 100 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].qty).toBe('')
+    })
+
+    it('正規化後に tryCalculate が NaN を計算しないこと（qty が空文字 = 計算スキップ）', () => {
+      // qty='abc' → normalizeInput → '' → tryCalculate は qty !== '' を満たさず計算しない
+      const saved = { unit: 'g', items: [{ qty: 'abc', price: 100 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      // qty が '' なので allValid=false → result=null（NaN にならない）
+      expect(state.items[0].qty).toBe('')
+      expect(state.result).toBeNull()
+    })
+
+    it('正常な数値文字列 "100" は 100（number）に正規化される', () => {
+      // sessionStorage から復元した値が文字列 "100" の場合も正しく扱う
+      const saved = { unit: 'g', items: [{ qty: '100', price: '200' }, { qty: 300, price: 400 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].qty).toBe(100)
+      expect(state.items[0].price).toBe(200)
+      expect(state.items[0].errors.qty).toBe('')
+      expect(state.items[0].errors.price).toBe('')
+    })
+  })
 })

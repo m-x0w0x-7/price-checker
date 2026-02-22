@@ -1,5 +1,5 @@
 import { STORAGE_KEY, MIN_ITEMS, MAX_ITEMS } from './constants.js'
-import { validateValue } from './validation.js'
+import { normalizeInput, validateValue } from './validation.js'
 import { createItem } from './state.js'
 
 /**
@@ -44,8 +44,9 @@ export function restoreState(saved) {
   // 最大件数に切り捨て → 値を正規化してバリデーション
   const rawItems = (saved.items ?? []).slice(0, MAX_ITEMS)
   let items = rawItems.map((item) => {
-    const qty = item.qty ?? ''
-    const price = item.price ?? ''
+    // normalizeInput で型正規化（非数値文字列 → ''、数値は number 型に統一）
+    const qty = normalizeInput(item.qty ?? '')
+    const price = normalizeInput(item.price ?? '')
     return {
       qty,
       price,

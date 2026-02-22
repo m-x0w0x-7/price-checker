@@ -65,4 +65,30 @@ describe('validation', () => {
       expect(validateValue('')).toBe('')
     })
   })
+
+  describe('validateValue — 非数値型ガード（High: NaN 防止）', () => {
+    it('文字列 "abc" はエラー（数字を入力してください）', () => {
+      expect(validateValue('abc')).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('数字に見える文字列 "123" も型が string ならエラー', () => {
+      expect(validateValue('123')).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('NaN はエラー', () => {
+      expect(validateValue(NaN)).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('Infinity はエラー', () => {
+      expect(validateValue(Infinity)).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('-Infinity はエラー', () => {
+      expect(validateValue(-Infinity)).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('null はエラー', () => {
+      expect(validateValue(null)).toBe(ERROR_MESSAGES.ZERO)
+    })
+  })
 })

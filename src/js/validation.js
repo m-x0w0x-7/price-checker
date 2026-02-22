@@ -24,15 +24,18 @@ export function normalizeInput(rawValue) {
 
 /**
  * 値をバリデーションしてエラーメッセージを返す
- * - 正常値は空文字
+ * - 正常値（正の有限整数）は空文字
+ * - 空文字 → 空文字（未入力扱い）
+ * - 非 number 型・NaN・±Infinity → ERROR_MESSAGES.ZERO（数字を入力してください）
  * - 0 → ERROR_MESSAGES.ZERO
  * - 負数 → ERROR_MESSAGES.NEGATIVE
- * - 空文字 → 空文字（未入力扱い）
  * @param {number|''} value
  * @returns {string} エラーメッセージ（なければ空文字）
  */
 export function validateValue(value) {
   if (value === '') return ''
+  // string / null / NaN / ±Infinity は有効な数値でない
+  if (typeof value !== 'number' || !isFinite(value)) return ERROR_MESSAGES.ZERO
   if (value < 0) return ERROR_MESSAGES.NEGATIVE
   if (value === 0) return ERROR_MESSAGES.ZERO
   return ''

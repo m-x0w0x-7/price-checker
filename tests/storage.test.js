@@ -108,6 +108,48 @@ describe('storage', () => {
       expect(state.unit).toBe('g')
     })
 
+    it('unit が不正値のとき g にフォールバックする', () => {
+      const saved = { unit: 'evil', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('g')
+    })
+
+    it('unit が空文字のとき g にフォールバックする', () => {
+      const saved = { unit: '', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('g')
+    })
+
+    it('unit が null のとき g にフォールバックする', () => {
+      const saved = { unit: null, items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('g')
+    })
+
+    it('unit が g のとき g のまま', () => {
+      const saved = { unit: 'g', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('g')
+    })
+
+    it('unit が ml のとき ml のまま', () => {
+      const saved = { unit: 'ml', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('ml')
+    })
+
+    it('unit が piece のとき piece のまま', () => {
+      const saved = { unit: 'piece', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('piece')
+    })
+
+    it('unit が bag のとき bag のまま', () => {
+      const saved = { unit: 'bag', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.unit).toBe('bag')
+    })
+
     it('items が未定義のとき MIN_ITEMS 件に補完される', () => {
       const saved = { unit: 'g' }
       const state = restoreState(saved)

@@ -57,6 +57,50 @@ describe('dom', () => {
     })
   })
 
+  describe('createItemCard — XSS 対策（Medium: innerHTML 未エスケープ防止）', () => {
+    it('item.qty の値が HTML として解釈されない（input.value で設定）', () => {
+      const item = { qty: 100, price: 200, errors: { qty: '', price: '' } }
+      const card = createItemCard(item, 0, 'g')
+      const input = card.querySelector('[data-field="qty"]')
+      // .value プロパティで設定されていること
+      expect(input.value).toBe('100')
+    })
+
+    it('item.price の値が HTML として解釈されない（input.value で設定）', () => {
+      const item = { qty: 100, price: 200, errors: { qty: '', price: '' } }
+      const card = createItemCard(item, 0, 'g')
+      const input = card.querySelector('[data-field="price"]')
+      expect(input.value).toBe('200')
+    })
+
+    it('errors.qty がテキストとして設定され HTML タグを解釈しない', () => {
+      const item = { qty: 0, price: 200, errors: { qty: '<b>注入</b>', price: '' } }
+      const card = createItemCard(item, 0, 'g')
+      const errorEl = card.querySelector('[data-error="qty"]')
+      // <b> タグが DOM 要素として解釈されていないこと
+      expect(errorEl.querySelector('b')).toBeNull()
+      // テキストとしてそのまま表示されること
+      expect(errorEl.textContent).toBe('<b>注入</b>')
+    })
+
+    it('errors.price がテキストとして設定され HTML タグを解釈しない', () => {
+      const item = { qty: 100, price: 0, errors: { qty: '', price: '<script>evil()</script>' } }
+      const card = createItemCard(item, 0, 'g')
+      const errorEl = card.querySelector('[data-error="price"]')
+      expect(errorEl.querySelector('script')).toBeNull()
+      expect(errorEl.textContent).toBe('<script>evil()</script>')
+    })
+
+    it('item.qty の改ざん値が innerHTML に属性として注入されない', () => {
+      // sessionStorage 改ざんを想定: " data-evil="injected
+      const item = { qty: '" data-evil="injected', price: '', errors: { qty: '', price: '' } }
+      const card = createItemCard(item, 0, 'g')
+      // data-evil 属性が生成されていないこと
+      const qtyInput = card.querySelector('[data-field="qty"]')
+      expect(qtyInput.dataset.evil).toBeUndefined()
+    })
+  })
+
   describe('renderItemList', () => {
     let listEl
 

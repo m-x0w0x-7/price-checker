@@ -1,6 +1,6 @@
 import { saveState, loadState, restoreState } from '../src/js/storage.js'
 import { createInitialState, updateItemField, addItem } from '../src/js/state.js'
-import { STORAGE_KEY } from '../src/js/constants.js'
+import { STORAGE_KEY, ERROR_MESSAGES, MIN_ITEMS, MAX_ITEMS } from '../src/js/constants.js'
 
 describe('storage', () => {
   beforeEach(() => {
@@ -108,10 +108,86 @@ describe('storage', () => {
       expect(state.unit).toBe('g')
     })
 
-    it('items が未定義のとき空配列にフォールバックする', () => {
+    it('items が未定義のとき MIN_ITEMS 件に補完される', () => {
       const saved = { unit: 'g' }
       const state = restoreState(saved)
-      expect(state.items).toEqual([])
+      // 件数制約により空配列ではなく MIN_ITEMS 件になる
+      expect(state.items.length).toBe(MIN_ITEMS)
+    })
+  })
+
+  describe('restoreState — バリデーション（High: Infinity 防止）', () => {
+    it('qty=0 は errors.qty に ZERO エラーが設定される', () => {
+      const saved = { unit: 'g', items: [{ qty: 0, price: 100 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].errors.qty).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('price=0 は errors.price に ZERO エラーが設定される', () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: 0 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].errors.price).toBe(ERROR_MESSAGES.ZERO)
+    })
+
+    it('qty=-1 は errors.qty に NEGATIVE エラーが設定される', () => {
+      const saved = { unit: 'g', items: [{ qty: -1, price: 100 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].errors.qty).toBe(ERROR_MESSAGES.NEGATIVE)
+    })
+
+    it('price=-100 は errors.price に NEGATIVE エラーが設定される', () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: -100 }, { qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].errors.price).toBe(ERROR_MESSAGES.NEGATIVE)
+    })
+
+    it('正常な値（qty=100, price=200）は errors が空', () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: 200 }, { qty: 300, price: 400 }] }
+      const state = restoreState(saved)
+      expect(state.items[0].errors.qty).toBe('')
+      expect(state.items[0].errors.price).toBe('')
+    })
+
+    it('空文字（未入力）は errors が空', () => {
+      const saved = { unit: 'g', items: [{ qty: '', price: '' }, { qty: '', price: '' }] }
+      const state = restoreState(saved)
+      expect(state.items[0].errors.qty).toBe('')
+      expect(state.items[0].errors.price).toBe('')
+    })
+  })
+
+  describe('restoreState — 件数制約（Medium: 2〜4件）', () => {
+    it(`0件のとき ${MIN_ITEMS} 件（最小）に補完される`, () => {
+      const saved = { unit: 'g', items: [] }
+      const state = restoreState(saved)
+      expect(state.items.length).toBe(MIN_ITEMS)
+    })
+
+    it(`1件のとき ${MIN_ITEMS} 件（最小）に補完される`, () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      expect(state.items.length).toBe(MIN_ITEMS)
+    })
+
+    it(`5件のとき ${MAX_ITEMS} 件（最大）に切り捨てられる`, () => {
+      const saved = { unit: 'g', items: Array(5).fill({ qty: 100, price: 200 }) }
+      const state = restoreState(saved)
+      expect(state.items.length).toBe(MAX_ITEMS)
+    })
+
+    it('補完された商品は空の初期値を持つ', () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: 200 }] }
+      const state = restoreState(saved)
+      // 2件目は補完された空のアイテム
+      expect(state.items[1].qty).toBe('')
+      expect(state.items[1].price).toBe('')
+      expect(state.items[1].errors).toEqual({ qty: '', price: '' })
+    })
+
+    it('2件のとき件数はそのまま', () => {
+      const saved = { unit: 'g', items: [{ qty: 100, price: 200 }, { qty: 300, price: 400 }] }
+      const state = restoreState(saved)
+      expect(state.items.length).toBe(2)
     })
   })
 })

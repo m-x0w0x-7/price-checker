@@ -1,4 +1,6 @@
-import { STORAGE_KEY } from './constants.js'
+import { STORAGE_KEY, MIN_ITEMS, MAX_ITEMS } from './constants.js'
+import { validateValue } from './validation.js'
+import { createItem } from './state.js'
 
 /**
  * 状態を sessionStorage に保存する
@@ -32,18 +34,36 @@ export function loadState() {
 }
 
 /**
- * 保存データをアプリ状態に変換する（errors と result を付与）
+ * 保存データをアプリ状態に変換する
+ * - 各値を再バリデーションし errors を設定する（Infinity 防止）
+ * - 件数を MIN_ITEMS〜MAX_ITEMS に正規化する（仕様違反防止）
  * @param {{ unit: string, items: Array<{qty: number|'', price: number|''}> }} saved
  * @returns {object} state
  */
 export function restoreState(saved) {
+  // 最大件数に切り捨て → 値を正規化してバリデーション
+  const rawItems = (saved.items ?? []).slice(0, MAX_ITEMS)
+  let items = rawItems.map((item) => {
+    const qty = item.qty ?? ''
+    const price = item.price ?? ''
+    return {
+      qty,
+      price,
+      errors: {
+        qty: validateValue(qty),
+        price: validateValue(price),
+      },
+    }
+  })
+
+  // 最小件数に満たない場合は空のアイテムで補完
+  while (items.length < MIN_ITEMS) {
+    items.push(createItem())
+  }
+
   return {
     unit: saved.unit ?? 'g',
-    items: (saved.items ?? []).map((item) => ({
-      qty: item.qty ?? '',
-      price: item.price ?? '',
-      errors: { qty: '', price: '' },
-    })),
+    items,
     result: null,
   }
 }

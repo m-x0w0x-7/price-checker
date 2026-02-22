@@ -12,9 +12,10 @@ export function createItemCard(item, index, unit) {
   li.className = 'item-card'
   li.dataset.index = String(index)
 
-  const unitLabel = UNIT_LABEL[unit] ?? unit
   const unitDisplay = UNIT_DISPLAY[unit] ?? ''
 
+  // ユーザー由来の値（item.qty, item.price, item.errors.*）は innerHTML に含めない。
+  // index はアプリ内部の数値のみなので埋め込みは安全。
   li.innerHTML = `
     <div class="item-card__header">
       <span class="item-card__number">商品 ${index + 1}</span>
@@ -34,13 +35,12 @@ export function createItemCard(item, index, unit) {
             max="99999"
             step="1"
             placeholder="0"
-            value="${item.qty}"
             data-field="qty"
             data-index="${index}"
           />
-          <span class="input-field__unit">${unitLabel}</span>
+          <span class="input-field__unit"></span>
         </div>
-        <span class="input-field__error" data-error="qty" data-index="${index}">${item.errors.qty}</span>
+        <span class="input-field__error" data-error="qty" data-index="${index}"></span>
       </div>
       <div class="input-field">
         <label class="input-field__label" for="price-${index}">価格</label>
@@ -55,21 +55,43 @@ export function createItemCard(item, index, unit) {
             max="99999"
             step="1"
             placeholder="0"
-            value="${item.price}"
             data-field="price"
             data-index="${index}"
           />
           <span class="input-field__unit">円</span>
         </div>
-        <span class="input-field__error" data-error="price" data-index="${index}">${item.errors.price}</span>
+        <span class="input-field__error" data-error="price" data-index="${index}"></span>
       </div>
     </div>
     <div class="item-card__result">
-      <span class="item-card__unit-price item-card__unit-price--placeholder">-- ${unitDisplay}</span>
+      <span class="item-card__unit-price item-card__unit-price--placeholder"></span>
       <span class="item-card__badge item-card__badge--cheapest">こっちがお得！</span>
       <span class="item-card__badge item-card__badge--tie">同じ</span>
     </div>
   `
+
+  // ユーザー由来の値は安全な DOM API で設定する
+  const qtyInput = li.querySelector('[data-field="qty"]')
+  const priceInput = li.querySelector('[data-field="price"]')
+  const qtyUnitEl = li.querySelector('.input-field__unit')
+  const qtyErrorEl = li.querySelector('[data-error="qty"]')
+  const priceErrorEl = li.querySelector('[data-error="price"]')
+  const unitPriceEl = li.querySelector('.item-card__unit-price')
+
+  qtyInput.value = item.qty === '' ? '' : String(item.qty)
+  priceInput.value = item.price === '' ? '' : String(item.price)
+  qtyUnitEl.textContent = UNIT_LABEL[unit] ?? unit
+  qtyErrorEl.textContent = item.errors.qty
+  priceErrorEl.textContent = item.errors.price
+  unitPriceEl.textContent = `-- ${unitDisplay}`
+
+  // エラーがある場合は input-field__wrapper--error クラスを付与
+  if (item.errors.qty) {
+    qtyInput.closest('.input-field__wrapper').classList.add('input-field__wrapper--error')
+  }
+  if (item.errors.price) {
+    priceInput.closest('.input-field__wrapper').classList.add('input-field__wrapper--error')
+  }
 
   return li
 }

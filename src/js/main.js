@@ -1,10 +1,11 @@
 import { createInitialState, addItem, removeItem, setUnit, updateItemField } from './state.js'
 import { renderItemList, updateAddButton, renderResult, renderError } from './dom.js'
-import { loadState, saveState } from './storage.js'
+import { loadState, saveState, restoreState } from './storage.js'
 import { normalizeInput, validateValue } from './validation.js'
 import { calculate } from './calculator.js'
 
-let state = loadState() ?? createInitialState()
+const saved = loadState()
+let state = saved ? restoreState(saved) : createInitialState()
 
 const listEl = document.getElementById('item-list')
 const addBtn = document.getElementById('add-btn')

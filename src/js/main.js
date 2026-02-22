@@ -1,6 +1,8 @@
-import { createInitialState, addItem, removeItem, setUnit } from './state.js'
-import { renderItemList, updateAddButton, renderResult } from './dom.js'
+import { createInitialState, addItem, removeItem, setUnit, updateItemField } from './state.js'
+import { renderItemList, updateAddButton, renderResult, renderError } from './dom.js'
 import { loadState, saveState } from './storage.js'
+import { normalizeInput, validateValue } from './validation.js'
+import { calculate } from './calculator.js'
 
 let state = loadState() ?? createInitialState()
 
@@ -16,39 +18,120 @@ function render() {
   saveState(state)
 }
 
-/** 追加ボタン */
+/** 全商品の入力が有効かどうかを確認し、有効なら計算する */
+function tryCalculate() {
+  const allValid = state.items.every(
+    (item) =>
+      item.qty !== '' &&
+      item.price !== '' &&
+      item.errors.qty === '' &&
+      item.errors.price === ''
+  )
+
+  if (allValid) {
+    state = { ...state, result: calculate(state.items) }
+  } else {
+    state = { ...state, result: null }
+  }
+}
+
+/** 入力フィールドのフォーカスアウト処理 */
+function handleBlur(input) {
+  const index = Number(input.dataset.index)
+  const field = input.dataset.field
+
+  // 小数を切り捨て、MAX_VALUE を超える場合は丸める
+  const normalized = normalizeInput(input.value)
+  state = updateItemField(state, index, field, normalized)
+
+  // バリデーション
+  const error = validateValue(normalized)
+  state = updateItemField(state, index, 'errors', {
+    ...state.items[index].errors,
+    [field]: error,
+  })
+
+  // 入力欄の表示値を更新（切り捨て後の値を反映）
+  input.value = normalized === '' ? '' : String(normalized)
+
+  // エラー表示を更新
+  renderError(listEl, index, field, error)
+
+  // 全商品有効なら計算
+  tryCalculate()
+  renderResult(listEl, state.result, state.unit)
+  saveState(state)
+}
+
+/** Enter キーで次のフォーカス先に移動する */
+function handleEnter(input) {
+  const inputs = Array.from(listEl.querySelectorAll('.input-field__input'))
+  const currentIndex = inputs.indexOf(input)
+  const nextInput = inputs[currentIndex + 1]
+  if (nextInput) {
+    nextInput.focus()
+  } else {
+    input.blur()
+  }
+}
+
+// ===========================
+// 追加ボタン
+// ===========================
 addBtn.addEventListener('click', () => {
   state = addItem(state)
   render()
 })
 
-/** 単位変更 */
+// ===========================
+// 単位変更
+// ===========================
 unitSelect.addEventListener('change', (e) => {
   state = setUnit(state, e.target.value)
   unitSelect.value = state.unit
   render()
 })
 
-/** 商品リスト内のイベント委譲 */
+// ===========================
+// 商品リスト内のイベント委譲
+// ===========================
 listEl.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-action="remove"]')
   if (!btn) return
   const index = Number(btn.dataset.index)
   state = removeItem(state, index)
+  state = { ...state, result: null }
+  tryCalculate()
   render()
 })
 
-/** 入力欄のイベントは Phase 3 で追加 */
+listEl.addEventListener('blur', (e) => {
+  const input = e.target.closest('.input-field__input')
+  if (!input) return
+  handleBlur(input)
+}, true)
 
+listEl.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return
+  const input = e.target.closest('.input-field__input')
+  if (!input) return
+  e.preventDefault()
+  handleEnter(input)
+})
+
+// ===========================
 // 外部タップでフォーカスを外す
+// ===========================
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.item-card')) {
+  if (!e.target.closest('#item-list') && !e.target.closest('#add-btn')) {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
   }
 })
 
+// ===========================
 // 初期描画
+// ===========================
 unitSelect.value = state.unit
 render()

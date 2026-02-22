@@ -123,11 +123,16 @@ listEl.addEventListener('keydown', (e) => {
 // ===========================
 // 外部タップでフォーカスを外す
 // ===========================
+// item-list 内の入力欄にフォーカスがある状態で外部をタップした場合のみ blur する。
+// unit-select など item-list 外の要素は対象外にすることで誤 blur を防ぐ。
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('#item-list') && !e.target.closest('#add-btn')) {
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur()
-    }
+  const active = document.activeElement
+  if (
+    active instanceof HTMLElement &&
+    listEl.contains(active) &&
+    !e.target.closest('#item-list')
+  ) {
+    active.blur()
   }
 })
 

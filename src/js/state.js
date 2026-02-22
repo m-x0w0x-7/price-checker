@@ -66,7 +66,7 @@ export function updateItemField(state, index, field, value) {
 }
 
 /**
- * 単位を変更し、全商品の qty をクリアして result を null にする
+ * 単位を変更し、全商品の qty と price をクリアして result を null にする
  * @param {object} state
  * @param {string} unit
  * @returns {object} 新しい state
@@ -75,7 +75,8 @@ export function setUnit(state, unit) {
   const items = state.items.map((item) => ({
     ...item,
     qty: '',
-    errors: { ...item.errors, qty: '' },
+    price: '',
+    errors: { qty: '', price: '' },
   }))
   return { ...state, unit, items, result: null }
 }

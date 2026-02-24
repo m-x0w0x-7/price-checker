@@ -10,3 +10,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - セキュリティルールに従ってください。
 - 強制追加など-fコマンドは禁止です。
 - 計画内容、進捗状況は、artchitecture.md、tasks.mdを確認してください。
+- 外部ライブラリを提案するときは、GitHubのスター数1000以上・最終更新3ヶ月以内のものに限定してください。また、Shai-Hulud攻撃に関連する疑わしいパッケージは避けてインストールしてください

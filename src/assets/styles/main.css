@@ -16,8 +16,8 @@
   --color-primary: #f59e0b;          /* amber-500: メインアクセント */
   --color-primary-hover: #d97706;    /* amber-600: ホバー */
   --color-danger: #dc2626;
-  --color-cheapest: #dcfce7;
-  --color-cheapest-border: #16a34a;
+  --color-cheapest: #f0fdf4;
+  --color-cheapest-border: #22c55e;
   --color-tie: #fef9c3;
   --color-tie-border: #ca8a04;
   --color-text: #1c1917;             /* stone-900: あたたかいダークテキスト */
@@ -90,7 +90,7 @@ body {
 .header__title {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--color-text);
+  color: #92400e;
   text-align: center;
   letter-spacing: 0.02em;
 }

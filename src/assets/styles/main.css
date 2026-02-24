@@ -8,30 +8,40 @@
 }
 
 :root {
-  --color-bg: #f5f5f5;
-  --color-surface: #ffffff;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
+  /* クリーム/アンバーパレット */
+  --color-bg: #fffbeb;              /* amber-50: あたたかいクリーム背景 */
+  --color-surface: #ffffff;          /* 白カード（背景との対比を確保） */
+  --color-header-bg: #fef3c7;        /* amber-100: ヘッダー背景 */
+  --color-header-border: #fde68a;    /* amber-200: ヘッダー下線 */
+  --color-primary: #f59e0b;          /* amber-500: メインアクセント */
+  --color-primary-hover: #d97706;    /* amber-600: ホバー */
   --color-danger: #dc2626;
   --color-cheapest: #dcfce7;
   --color-cheapest-border: #16a34a;
   --color-tie: #fef9c3;
   --color-tie-border: #ca8a04;
-  --color-text: #1a1a1a;
-  --color-text-secondary: #6b7280;
-  --color-border: #d1d5db;
-  --color-input-bg: #f9fafb;
-  --color-input-focus: #2563eb;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --color-text: #1c1917;             /* stone-900: あたたかいダークテキスト */
+  --color-text-secondary: #78716c;   /* stone-500: あたたかいグレー */
+  --color-border: #fde68a;           /* amber-200: ウォームボーダー */
+  --color-input-bg: #fffbeb;         /* クリーム入力欄 */
+  --color-input-focus: #f59e0b;      /* アンバーフォーカス */
+
+  /* より丸みのあるRadius（親しみやすさ） */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  /* アンバートーンのやわらかい影 */
+  --shadow-card: 0 2px 8px rgba(251, 191, 36, 0.18);
+  --shadow-header: 0 1px 4px rgba(251, 191, 36, 0.2);
+
   --font-size-xs: 11px;
   --font-size-sm: 13px;
   --font-size-base: 15px;
   --font-size-lg: 17px;
   --font-size-xl: 20px;
   --font-size-2xl: 24px;
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
@@ -69,12 +79,13 @@ body {
    Header
 =========================== */
 .header {
-  background-color: var(--color-surface);
+  background-color: var(--color-header-bg);
   padding: var(--spacing-lg) var(--spacing-xl);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-header-border);
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: var(--shadow-header);
 }
 
 .header__title {
@@ -82,6 +93,7 @@ body {
   font-weight: 700;
   color: var(--color-text);
   text-align: center;
+  letter-spacing: 0.02em;
 }
 
 /* ===========================
@@ -106,6 +118,7 @@ body {
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
+  border: 1.5px solid var(--color-border);
 }
 
 .unit-section__label {
@@ -132,13 +145,15 @@ body {
   color: var(--color-text);
   cursor: pointer;
   outline: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  min-height: 48px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2378716c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 12px center;
 }
 
 .unit-section__select:focus {
   border-color: var(--color-input-focus);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 /* ===========================
@@ -159,7 +174,7 @@ body {
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-card);
-  border: 2px solid transparent;
+  border: 2px solid var(--color-border);
   transition: border-color 0.2s ease, background-color 0.2s ease;
   position: relative;
 }
@@ -190,13 +205,15 @@ body {
 .item-card__delete-btn {
   display: none;
   background: none;
-  border: 1px solid var(--color-danger);
+  border: 1.5px solid var(--color-danger);
   color: var(--color-danger);
   border-radius: var(--radius-sm);
-  padding: 2px var(--spacing-sm);
-  font-size: var(--font-size-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
   cursor: pointer;
-  line-height: 1.6;
+  line-height: 1.4;
+  min-height: 40px;
+  min-width: 60px;
 }
 
 .item-card__delete-btn:active {
@@ -236,22 +253,27 @@ body {
   border-radius: var(--radius-sm);
   background-color: var(--color-input-bg);
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input-field__wrapper:focus-within {
   border-color: var(--color-input-focus);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 .input-field__wrapper--error {
   border-color: var(--color-danger);
 }
 
+.input-field__wrapper--error:focus-within {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
 .input-field__input {
   flex: 1;
   border: none;
   background: transparent;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 14px var(--spacing-md);  /* 48px以上のタッチターゲット確保 */
   font-size: var(--font-size-lg);
   font-weight: 500;
   color: var(--color-text);
@@ -270,7 +292,7 @@ body {
 .input-field__unit {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  padding-right: var(--spacing-sm);
+  padding-right: var(--spacing-md);
   white-space: nowrap;
 }
 
@@ -306,7 +328,7 @@ body {
   display: none;
   font-size: var(--font-size-xs);
   font-weight: 700;
-  padding: 3px var(--spacing-sm);
+  padding: 4px var(--spacing-md);
   border-radius: 99px;
   white-space: nowrap;
 }
@@ -336,21 +358,25 @@ body {
   color: white;
   border: none;
   border-radius: var(--radius-md);
-  padding: var(--spacing-md) var(--spacing-2xl);
+  padding: var(--spacing-lg) var(--spacing-2xl);
   font-size: var(--font-size-base);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   max-width: 300px;
+  min-height: 52px;                /* 十分なタッチターゲット */
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);
 }
 
 .add-btn:active {
   background-color: var(--color-primary-hover);
+  box-shadow: none;
 }
 
 .add-btn:disabled {
   background-color: var(--color-border);
   color: var(--color-text-secondary);
   cursor: not-allowed;
+  box-shadow: none;
 }

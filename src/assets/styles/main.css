@@ -16,14 +16,14 @@
   --color-primary: #f59e0b;          /* amber-500: メインアクセント */
   --color-primary-hover: #d97706;    /* amber-600: ホバー */
   --color-danger: #dc2626;
-  --color-cheapest: #dcfce7;
-  --color-cheapest-border: #16a34a;
+  --color-cheapest: #f7fef9;
+  --color-cheapest-border: #4ade80;
   --color-tie: #fef9c3;
   --color-tie-border: #ca8a04;
   --color-text: #1c1917;             /* stone-900: あたたかいダークテキスト */
   --color-text-secondary: #78716c;   /* stone-500: あたたかいグレー */
-  --color-border: #fde68a;           /* amber-200: ウォームボーダー */
-  --color-input-bg: #fffbeb;         /* クリーム入力欄 */
+  --color-border: #ffeeac;           /* ウォームボーダー（淡めに調整） */
+  --color-input-bg: #fffdf5;         /* クリーム入力欄（白に近い淡さ） */
   --color-input-focus: #f59e0b;      /* アンバーフォーカス */
 
   /* より丸みのあるRadius（親しみやすさ） */
@@ -90,7 +90,7 @@ body {
 .header__title {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--color-text);
+  color: #92400e;
   text-align: center;
   letter-spacing: 0.02em;
 }
